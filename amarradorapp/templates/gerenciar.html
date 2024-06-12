@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Ciclo - {{ ciclo.id }}</title>
+    <script>
+        function confirmarExclusao(gastoId, descricao, valor) {
+            const confirmacao = confirm(`Deseja excluir o gasto de R$${valor} referente a "${descricao}"?`);
+            if (confirmacao) {
+                window.location.href = `/excluir_gasto/${gastoId}/`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Ciclo {{ ciclo.id }}</h1>
+    <p>Nome do Ciclo: {{ ciclo.nome }}</p>
+    <p>Valor Total: R$ {{ ciclo.valor }}</p>
+    <p>Data de Início: {{ ciclo.data_inicio }}</p>
+    <p>Data de Fim: {{ ciclo.data_fim }}</p>
+    <p>Texto: {{ ciclo.texto }}</p>
+    <p>Limite Diário: R$ {{ ciclo.limite_diario }}</p>
+    <p>Dias Passados: {{ ciclo.dias_passados }}</p>
+
+    <h2>Gastos</h2>
+    <ul>
+        {% for gasto in gastos %}
+        <li>
+            R$ {{ gasto.valor }} - {{ gasto.data }} - {{ gasto.descricao }}
+            <a href="javascript:void(0);" onclick="confirmarExclusao('{{ gasto.id }}', '{{ gasto.descricao }}', '{{ gasto.valor }}')">[x]</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Gasto Hoje</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="valor">Valor do Gasto:</label><br>
+        <input type="number" id="valor" name="valor" step="1" required><br>
+        <label for="descricao">Descrição do Gasto:</label><br>
+        <textarea id="descricao" name="descricao" required></textarea><br>
+        <input type="submit" value="Registrar Gasto" margin="3px">
+    </form>
+</body>
+</html>
