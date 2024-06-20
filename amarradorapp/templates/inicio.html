@@ -1,21 +1,30 @@
+<!-- inicio.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Início</title>
+    <title>Página Inicial</title>
 </head>
 <body>
-    <h1>Página Inicial</h1>
-    <button onclick="window.location.href='/ciclo/'">Criar Novo Ciclo</button>
 
-    <h2>Ciclos em Andamento</h2>
-    <ul>
-        {% for ciclo in ciclos_em_andamento %}
-        <li>
-            <button onclick="window.location.href='/gerenciar/{{ ciclo.id }}/'">{{ ciclo.nome }}</button>
-        </li>
-        {% endfor %}
-    </ul>
+<h1>Lista de Ciclos em Andamento</h1>
+<ul>
+    {% for ciclo in ciclos_em_andamento %}
+    <li>
+        <a href="{% url 'gerenciar' ciclo.id %}">Ciclo {{ ciclo.nome }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<h1>Lista de Ciclos Encerrados</h1>
+<ul>
+    {% for ciclo in ciclos_encerrados %}
+    <li>
+        <a href="{% url 'relatorio' ciclo.id %}">Relatório do Ciclo {{ ciclo.nome }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
 </body>
 </html>

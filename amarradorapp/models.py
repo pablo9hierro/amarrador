@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from decimal import Decimal
 
 class Ciclo(models.Model):
     valor = models.IntegerField()
@@ -7,8 +8,9 @@ class Ciclo(models.Model):
     data_fim = models.DateField()
     texto = models.TextField()
     nome = models.CharField(max_length=100, default="Valor Padrão")
-    limite_diario = models.IntegerField(default=0)
+    limite_diario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     dias_passados = models.IntegerField(default=0)
+    encerrado = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Ciclo de {self.data_inicio} a {self.data_fim} - Valor: {self.valor}'
@@ -40,6 +42,13 @@ class Ciclo(models.Model):
     def subtrair_do_limite_diario(self, valor):
         valor = int(valor)
         self.limite_diario -= valor
+        self.valor -= valor
+        self.save()
+        if self.valor <= 0:
+            self.encerrar_ciclo()
+
+    def encerrar_ciclo(self):
+        self.encerrado = True
         self.save()
 
 class Gasto(models.Model):
@@ -47,6 +56,7 @@ class Gasto(models.Model):
     valor = models.IntegerField()
     descricao = models.TextField()
     data = models.DateField(auto_now_add=True)
+    excluido = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Gasto de R$ {self.valor} em {self.data} para o ciclo {self.ciclo.nome}'

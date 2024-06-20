@@ -1,0 +1,52 @@
+<!-- relatorio.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório do Ciclo - {{ ciclo.id }}</title>
+    <script>
+        function confirmarImpressaoRelatorio() {
+            if (confirm("Deseja imprimir o relatório deste ciclo?")) {
+                window.location.href = "{% url 'imprimir_relatorio' ciclo.id %}";
+            }
+        }
+        window.onload = function() {
+            confirmarImpressaoRelatorio();
+        };
+
+    </script>
+</head>
+<body>
+<div>
+    <a href="{% url 'inicio' %}" style="padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+        Voltar à Página Inicial
+    </a>
+</div>
+<h1><a href="{% url 'inicio' %}">Voltar à Página Inicial</a></h1>
+<h1>Relatório do Ciclo {{ ciclo.id }}</h1>
+<p>Nome do Ciclo: {{ ciclo.nome }}</p>
+<p>Valor Total: R$ {{ ciclo.valor }}</p>
+<p>Data de Início: {{ ciclo.data_inicio }}</p>
+<p>Data de Fim: {{ ciclo.data_fim }}</p>
+<p>Texto: {{ ciclo.texto }}</p>
+<p>Limite Diário: R$ {{ ciclo.limite_diario }}</p>
+
+<h2>Gastos</h2>
+<ul>
+    {% for gasto in gastos %}
+    <li>
+        R$ {{ gasto.valor }} - {{ gasto.data }} - {{ gasto.descricao }}
+    </li>
+    {% endfor %}
+</ul>
+
+<div>
+    <button onclick="confirmarImpressaoRelatorio()" 
+    style="padding: 10px 20px; margin-top: 10px; border-radius: 5px; cursor: pointer;">
+    Imprimir Relatório
+    </button>
+</div>
+
+</body>
+</html>
