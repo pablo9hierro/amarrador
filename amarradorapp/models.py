@@ -48,8 +48,8 @@ class Ciclo(models.Model):
             self.encerrar_ciclo()
 
     def encerrar_ciclo(self):
-        self.encerrado = True
-        self.save()
+        self.encerrado = True  # Marca o ciclo como encerrado
+        self.save() #salva banco de dados
 
 class Gasto(models.Model):
     ciclo = models.ForeignKey(Ciclo, on_delete=models.CASCADE)
@@ -60,3 +60,10 @@ class Gasto(models.Model):
 
     def __str__(self):
         return f'Gasto de R$ {self.valor} em {self.data} para o ciclo {self.ciclo.nome}'
+    
+class CicloEncerrado(models.Model):
+        nome = models.CharField(max_length=100)
+        data_fim = models.DateField()
+
+        def __str__(self):
+            return f"Ciclo {self.nome} - Encerrado em {self.data_fim}"

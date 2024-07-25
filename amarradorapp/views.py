@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.timezone import now
 from django.urls import reverse
-from .models import Ciclo, Gasto
+from .models import Ciclo, Gasto, CicloEncerrado
 from datetime import datetime, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -9,8 +9,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 def inicio(request):
     ciclos_em_andamento = Ciclo.objects.filter(encerrado=False).order_by('data_inicio')
     ciclos_encerrados = Ciclo.objects.filter(encerrado=True).order_by('data_inicio')
+
     for ciclo in ciclos_em_andamento:
         ciclo.atualizar_dias_e_limite()
+
     return render(request, 'inicio.html', {'ciclos_em_andamento': ciclos_em_andamento, 'ciclos_encerrados': ciclos_encerrados})
 
 def ciclo_def(request):
@@ -110,15 +112,16 @@ def imprimir_relatorio(request, ciclo_id):
 def encerrar_e_redirecionar(request, ciclo_id):
     ciclo = get_object_or_404(Ciclo, id=ciclo_id)
     if request.method == 'POST':
-        ciclo.encerrar_ciclo()
-        return redirect('relatorio', ciclo_id=ciclo.id)
+        # Copiar dados do ciclo para CicloEncerrado
+        ciclo_encerrado = CicloEncerrado(
+            nome=ciclo.nome,
+            data_fim=ciclo.data_fim,
+        )
+        ciclo_encerrado.save()
 
-    return render(request, 'encerrar_imprimir.html', {'ciclo': ciclo})
-
-def encerrar_e_redirecionar(request, ciclo_id):
-    ciclo = get_object_or_404(Ciclo, id=ciclo_id)
-    if request.method == 'POST':
+        # Marcar ciclo como encerrado
         ciclo.encerrar_ciclo()
+        
         return redirect('relatorio', ciclo_id=ciclo.id)
 
     return render(request, 'encerrar_imprimir.html', {'ciclo': ciclo})
@@ -137,3 +140,11 @@ def encerrar_imprimir(request, ciclo_id):
         return redirect('relatorio', ciclo_id=ciclo.id)
     # Não renderiza nenhum template aqui
     return redirect('relatorio', ciclo_id=ciclo.id)
+
+def ciclos_encerrados(request):
+    ciclos_encerrados = CicloEncerrado.objects.all()
+    html = ""
+    for ciclo in ciclos_encerrados:
+        # Usamos o ID do ciclo encerrado para criar o link para a página de relatório
+        html += f'<li><a href="{reverse("relatorio", args=[ciclo.id])}">{ciclo.nome}</a></li>'
+    return HttpResponse(html)

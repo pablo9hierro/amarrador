@@ -6,19 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Ciclo - {{ ciclo.id }}</title>
     <script>
-        function confirmarEncerramentoEImprimir() {
-            if (confirm("Tem certeza que deseja encerrar este ciclo?")) {
-                // Redireciona para a view de encerrar e imprimir
-                window.location.href = "{% url 'encerrar_imprimir' ciclo.id %}";
-            }
-        }
+        function submitFormGastoHoje() {
+        // Lógica para validar ou processar o formulário
+        return true; // ou false, dependendo da validação
+    }
 
-        function confirmarImpressaoRelatorio() {
-            if (confirm("Deseja imprimir o relatório deste ciclo?")) {
-                // Redireciona para a view de imprimir relatório
-                window.location.href = "{% url 'imprimir_relatorio' ciclo.id %}";
-            }
+    function confirmarEncerramentoEImprimir() {
+        if (confirm("Tem certeza que deseja encerrar este ciclo?")) {
+            // Submete o formulário para encerrar o ciclo
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{% url 'encerrar_e_redirecionar' ciclo.id %}";
+            var csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = 'csrfmiddlewaretoken';
+            csrfToken.value = '{{ csrf_token }}';
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
         }
+    }
+
+    function confirmarImpressaoRelatorio() {
+        if (confirm("Deseja imprimir o relatório deste ciclo?")) {
+            // Redireciona para a view de imprimir relatório
+            window.location.href = "{% url 'imprimir_relatorio' ciclo.id %}";
+        }
+    }
+
+    function redirecionarRelatorio(url) {
+        window.location.href = url;
+    }
+
+    function confirmExclusao(valor, descricao) {
+    return confirm(`Deseja excluir o gasto de R$${valor} referente a "${descricao}"?`);
+}
     </script>
 </head>
 <body>
@@ -38,13 +60,14 @@
     {% for gasto in gastos %}
     <li>
         R$ {{ gasto.valor }} - {{ gasto.data }} - {{ gasto.descricao }}
-        <a href="{% url 'excluir_gasto' gasto.id %}" onclick="return confirm('Deseja excluir o gasto de R${{ gasto.valor }} referente a \"{{ gasto.descricao }}\"?')">[x]</a>
+        <a href="{% url 'excluir_gasto' gasto.id %}" onclick="return confirmExclusao('{{ gasto.valor }}', '{{ gasto.descricao }}')">[x]</a>
+
     </li>
     {% endfor %}
 </ul>
 
 <h2>Gasto Hoje</h2>
-<form id="gasto_hoje_form" method="post" onsubmit="return submitFormGastoHoje()">
+<form id="gasto_hoje_form" method="post" onsubmit="return submitFormGastoHoje();">
     {% csrf_token %}
     <label for="valor">Valor do Gasto:</label><br>
     <input type="number" id="valor" name="valor" step="0.01" min="0.01" required><br>
@@ -58,11 +81,13 @@
     style="padding: 10px 20px; margin-top: 10px; border-radius: 5px; cursor: pointer;">
     Retornar Relatório
     </button>
-
-    <button onclick="confirmarEncerramentoEImprimir()" 
-    style="padding: 10px 20px; margin-top: 10px; border-radius: 5px; cursor: pointer;">
-    Encerrar Ciclo e Imprimir Relatório
-    </button>
+</div>
+    <div>
+        <button onclick="confirmarEncerramentoEImprimir()" 
+        style="padding: 10px 20px; margin-top: 10px; border-radius: 5px; cursor: pointer;">
+        Encerrar Ciclo e Retornar Relatório
+        </button>
+    </div>
 </div>
 
 </body>

@@ -1,0 +1,19 @@
+<!-- ciclos_encerrados.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciclos Encerrados</title>
+</head>
+<body>
+<h1>Lista de Ciclos Encerrados</h1>
+<ul>
+    {% for ciclo_encerrado in ciclos_encerrados %}
+    <li>
+        <a href="{% url 'detalhe_ciclo_encerrado' ciclo_encerrado.id %}">{{ ciclo_encerrado.nome }}</a>
+    </li>
+    {% endfor %}
+</ul>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Inicial</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
 
@@ -18,13 +19,34 @@
 </ul>
 
 <h1>Lista de Ciclos Encerrados</h1>
-<ul>
+<ul id="ciclos-encerrados">
+    <!-- Ciclos encerrados carregados via AJAX -->
     {% for ciclo in ciclos_encerrados %}
-    <li>
-        <a href="{% url 'relatorio' ciclo.id %}">Relatório do Ciclo {{ ciclo.nome }}</a>
-    </li>
+    <li><a href="{% url 'relatorio' ciclo.id %}">{{ ciclo.nome }}</a></li>
+    {% empty %}
+    <li>Nenhum ciclo encerrado encontrado.</li>
     {% endfor %}
 </ul>
 
+<script>
+    $(document).ready(function() {
+        var urlCiclosEncerrados = '{% url 'ciclos_encerrados' %}';
+
+        function carregarCiclosEncerrados() {
+            $.ajax({
+                url: urlCiclosEncerrados,
+                method: 'GET',
+                success: function(data) {
+                    $('#ciclos-encerrados').html(data);
+                },
+                error: function(err) {
+                    console.error('Erro ao carregar ciclos encerrados:', err);
+                }
+            });
+        }
+
+        carregarCiclosEncerrados();
+    });
+</script>
 </body>
 </html>
